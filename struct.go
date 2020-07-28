@@ -177,7 +177,7 @@ func msDosTimeToTime(dosDate, dosTime uint16) time.Time {
 		int(dosTime&0x1f*2),
 		0, // nanoseconds
 
-		time.UTC,
+		time.Local,
 	)
 }
 
@@ -185,7 +185,6 @@ func msDosTimeToTime(dosDate, dosTime uint16) time.Time {
 // The resolution is 2s.
 // See: http://msdn.microsoft.com/en-us/library/ms724274(v=VS.85).aspx
 func timeToMsDosTime(t time.Time) (fDate uint16, fTime uint16) {
-	t = t.In(time.UTC)
 	fDate = uint16(t.Day() + int(t.Month())<<5 + (t.Year()-1980)<<9)
 	fTime = uint16(t.Second()/2 + t.Minute()<<5 + t.Hour()<<11)
 	return
@@ -251,8 +250,8 @@ func (h *FileHeader) SetMode(mode os.FileMode) {
 }
 
 // isZip64 reports whether the file size exceeds the 32 bit limit
-func (fh *FileHeader) isZip64() bool {
-	return fh.CompressedSize64 > uint32max || fh.UncompressedSize64 > uint32max
+func (h *FileHeader) isZip64() bool {
+	return h.CompressedSize64 > uint32max || h.UncompressedSize64 > uint32max
 }
 
 func msdosModeToFileMode(m uint32) (mode os.FileMode) {
