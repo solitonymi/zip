@@ -67,7 +67,7 @@ func TestWriter(t *testing.T) {
 
 	// write a zip file
 	buf := new(bytes.Buffer)
-	w := NewWriter(buf)
+	w := NewWriter(buf, true)
 
 	for _, wt := range writeTests {
 		testCreate(t, w, &wt)
@@ -101,7 +101,7 @@ func TestWriterOffset(t *testing.T) {
 	buf := new(bytes.Buffer)
 	existingData := []byte{1, 2, 3, 1, 2, 3, 1, 2, 3}
 	n, _ := buf.Write(existingData)
-	w := NewWriter(buf)
+	w := NewWriter(buf, true)
 	w.SetOffset(int64(n))
 
 	for _, wt := range writeTests {
@@ -124,7 +124,7 @@ func TestWriterOffset(t *testing.T) {
 
 func TestWriterFlush(t *testing.T) {
 	var buf bytes.Buffer
-	w := NewWriter(struct{ io.Writer }{&buf})
+	w := NewWriter(struct{ io.Writer }{&buf}, true)
 	_, err := w.Create("foo")
 	if err != nil {
 		t.Fatal(err)
@@ -186,7 +186,7 @@ func BenchmarkCompressedZipGarbage(b *testing.B) {
 	bigBuf := bytes.Repeat([]byte("a"), 1<<20)
 	for i := 0; i < b.N; i++ {
 		buf.Reset()
-		zw := NewWriter(&buf)
+		zw := NewWriter(&buf, true)
 		for j := 0; j < 3; j++ {
 			w, _ := zw.CreateHeader(&FileHeader{
 				Name:   "foo",

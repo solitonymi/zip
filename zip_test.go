@@ -20,7 +20,7 @@ import (
 
 func TestOver65kFiles(t *testing.T) {
 	buf := new(bytes.Buffer)
-	w := NewWriter(buf)
+	w := NewWriter(buf, true)
 	const nFiles = (1 << 16) + 42
 	for i := 0; i < nFiles; i++ {
 		_, err := w.CreateHeader(&FileHeader{
@@ -238,7 +238,7 @@ func testZip64(t testing.TB, size int64) *rleBuffer {
 	chunks := int(size / chunkSize)
 	// write 2^32 bytes plus "END\n" to a zip file
 	buf := new(rleBuffer)
-	w := NewWriter(buf)
+	w := NewWriter(buf, true)
 	f, err := w.CreateHeader(&FileHeader{
 		Name:   "huge.txt",
 		Method: Store,
@@ -338,7 +338,7 @@ func testZip64DirectoryRecordLength(buf *rleBuffer, t *testing.T) {
 
 func testInvalidHeader(h *FileHeader, t *testing.T) {
 	var buf bytes.Buffer
-	z := NewWriter(&buf)
+	z := NewWriter(&buf, true)
 
 	f, err := z.CreateHeader(h)
 	if err != nil {
@@ -359,7 +359,7 @@ func testInvalidHeader(h *FileHeader, t *testing.T) {
 
 func testValidHeader(h *FileHeader, t *testing.T) {
 	var buf bytes.Buffer
-	z := NewWriter(&buf)
+	z := NewWriter(&buf, true)
 
 	f, err := z.CreateHeader(h)
 	if err != nil {

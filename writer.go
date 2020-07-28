@@ -11,6 +11,7 @@ import (
 	"hash"
 	"hash/crc32"
 	"io"
+	"time"
 )
 
 // TODO(adg): support zip file comments
@@ -22,6 +23,7 @@ type Writer struct {
 	dir    []*header
 	last   *fileWriter
 	closed bool
+	utf8   bool
 }
 
 type header struct {
@@ -30,8 +32,8 @@ type header struct {
 }
 
 // NewWriter returns a new Writer writing a zip file to w.
-func NewWriter(w io.Writer) *Writer {
-	return &Writer{cw: &countWriter{w: bufio.NewWriter(w)}}
+func NewWriter(w io.Writer, utf8 bool) *Writer {
+	return &Writer{cw: &countWriter{w: bufio.NewWriter(w)}, utf8: utf8}
 }
 
 // SetOffset sets the offset of the beginning of the zip data within the
@@ -209,7 +211,13 @@ func (w *Writer) CreateHeader(fh *FileHeader) (io.Writer, error) {
 		// See https://golang.org/issue/11144 confusion.
 		return nil, errors.New("archive/zip: invalid duplicate FileHeader")
 	}
-
+	// Set UTF8 Flag
+	if w.utf8 {
+		fh.Flags |= 0x0800
+	}
+	if fh.ModifiedDate == 0 {
+		fh.SetModTime(time.Now().In(time.Local))
+	}
 	fh.Flags |= 0x8 // we will write a data descriptor
 	// TODO(alex): Look at spec and see if these need to be changed
 	// when using encryption.

@@ -1,6 +1,8 @@
-This fork add support for Standard Zip Encryption.
+This fork add support UTF8 Flag and ModTime.
 
-The work is based on https://github.com/alexmullins/zip
+The work is based on https://github.com/alexmullins/zip and
+https://github.com/yukpiz/zip
+
 
 Available encryption:
 
